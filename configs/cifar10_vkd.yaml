@@ -1,0 +1,66 @@
+experiment: cifar10_
+epochs: 100
+output_dir: save
+resume: null
+save_interval: 10
+
+model:
+  type: VanillaKD
+  args:
+    teacher_model: 
+      type: ViT
+      args:
+        image_size: 224
+        patch_size: 32
+        num_classes: 100
+        dim: 1024
+        depth: 6
+        heads: 16
+        mlp_dim: 2048
+        dropout: 0.1
+    student_model:
+      type: ViT
+      args:
+        image_size: 224
+        patch_size: 32
+        num_classes: 100
+        dim: 100 # TODO: Smaller?
+        depth: 3 # TODO: Smaller?
+        heads: 4 # TODO: Smaller?
+        mlp_dim: 256 # TODO: Smaller?
+        dropout: 0.1
+    train_transforms:
+    - type: ToTensor
+    - type: Resize
+      args:
+        size: [ 256, 256 ]
+    - type: RandomCrop
+      args:
+        size: 224
+    - type: RandomHorizontalFlip
+    - type: Normalize
+      args:
+        mean: [ 0.5074,0.4867,0.4411 ]
+        std: [ 0.2011,0.1987,0.2025 ]
+    val_transforms:
+      - type: ToTensor
+      - type: Resize
+        args:
+          size: [ 224, 224 ]
+      - type: Normalize
+        args:
+          mean: [ 0.5074,0.4867,0.4411 ]
+          std: [ 0.2011,0.1987,0.2025 ]
+    train_loader:
+      batch_size: 64
+      shuffle: True
+      num_workers: 16
+      pin_memory: True
+    val_loader:
+      batch_size: 64
+      shuffle: False
+      num_workers: 16
+      pin_memory: True
+    optimizer_teeacher:
+    optimizer_student:
+    loss_fn: 
