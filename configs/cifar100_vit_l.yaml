@@ -1,4 +1,4 @@
-experiment: cifar100-m
+experiment: cifar100-vit-l
 epochs: 100
 output_dir: save
 resume: null
@@ -65,8 +65,8 @@ model:
     image_size: 224
     patch_size: 32
     num_classes: 100
-    dim: 1024
-    depth: 6
+    dim: 2048
+    depth: 8
     heads: 16
-    mlp_dim: 2048
+    mlp_dim: 4096
     dropout: 0.1
