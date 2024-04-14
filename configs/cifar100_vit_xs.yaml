@@ -1,4 +1,4 @@
-experiment: cifar100-vit-m
+experiment: cifar100-vit-xs
 epochs: 100
 output_dir: save
 resume: null
