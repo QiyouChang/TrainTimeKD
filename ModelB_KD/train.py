@@ -1,15 +1,17 @@
 # Created by George Chang at 4/12/24
 import argparse
 import os.path
-
 import wandb
 import yaml
-from vit_utils import prepare
+import sys 
+sys.path.append('../')
+from KD_utils import prepare
+sys.path.append('/ModelB_KD')
 import torch.nn as nn
 import torch
 from tqdm import tqdm
 import shutil
-from KD import VanillaKD
+from ModelB_KD.KD.vanilla_kd.VanillaKD import VanillaKD
 
 def main(config, gpus):
     # init wandb
@@ -27,8 +29,7 @@ def main(config, gpus):
 
     teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer = prepare(config, gpus)
 
-    distiller = VanillaKD(teacher_model, student_model, train_loader, test_loader, 
-                      teacher_optimizer, student_optimizer)
+    distiller = VanillaKD(teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer)
     
     distiller.train_teacher(epochs=100, plot_losses=True, save_model=True)    # Train the teacher network
     distiller.train_student(epochs=100, plot_losses=True, save_model=True)    # Train the student network
@@ -36,7 +37,7 @@ def main(config, gpus):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='configs/cifar100.yaml', help='path to the configuration file')
+    parser.add_argument('--config', type=str, default='../configs/cifar10_vkd.yaml', help='path to the configuration file')
     parser.add_argument('--gpus', type=str, default='0', help='gpus to use')
     args = parser.parse_args()
 

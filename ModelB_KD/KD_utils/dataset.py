@@ -16,16 +16,16 @@ def make_transforms(config):
 
 
 def make_datasets(config):
-    train_transforms = make_transforms(config['train_transforms'])
-    test_transforms = make_transforms(config['test_transforms'])
+    train_transforms = make_transforms(config['train']['transforms'])
+    test_transforms = make_transforms(config['train']['transforms'])
     func = getattr(datasets, config['type'])
-    train_dataset = func(train=True, transform=train_transforms, **config['args'])
-    test_dataset = func(train=False, transform=test_transforms, **config['args'])
+    train_dataset = func(transform=train_transforms, **config['train']['args'])
+    test_dataset = func(transform=test_transforms, **config['test']['args'])
     return train_dataset, test_dataset
 
 
 def make_dataloaders(config):
     train_dataset, test_dataset = make_datasets(config)
-    train_loader = DataLoader(train_dataset, **config['train_loader'])
-    test_loader = DataLoader(test_dataset, **config['test_loader'])
+    train_loader = DataLoader(train_dataset, **config['train']['loader'])
+    test_loader = DataLoader(test_dataset, **config['test']['loader'])
     return train_loader, test_loader
