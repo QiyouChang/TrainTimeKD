@@ -24,8 +24,8 @@ def make_datasets(config):
     return train_dataset, test_dataset
 
 
-def make_dataloaders(config):
+def make_dataloaders(config, batch_size):
     train_dataset, test_dataset = make_datasets(config)
-    train_loader = DataLoader(train_dataset, **config['train']['loader'])
-    test_loader = DataLoader(test_dataset, **config['test']['loader'])
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, **config['train']['loader'])
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, **config['test']['loader'])
     return train_loader, test_loader

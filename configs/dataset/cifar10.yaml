@@ -1,25 +1,9 @@
-experiment: cifar100-vit-l
-epochs: 100
-output_dir: save
-resume: null
-save_interval: 10
-
-optimizer:
-  type: Adam
-  args:
-    lr: 3.0e-5
-
-scheduler:
-  type: CosineAnnealingLR
-  args:
-    T_max: 100
-
 dataset:
-  type: CIFAR100
+  type: CIFAR10
   train:
     args:
       train: True
-      root: /data/baole/cifar100
+      root: /data/baole/cifar10
       download: True
     transforms:
       - type: ToTensor
@@ -35,14 +19,13 @@ dataset:
           mean: [ 0.49139968, 0.48215827 ,0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
-      batch_size: 64
       shuffle: True
       num_workers: 16
       pin_memory: True
   test:
     args:
       train: False
-      root: /data/baole/cifar100
+      root: /data/baole/cifar10
       download: True
     transforms:
       - type: ToTensor
@@ -54,19 +37,6 @@ dataset:
           mean: [ 0.49139968, 0.48215827, 0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
-      batch_size: 64
       shuffle: False
       num_workers: 16
       pin_memory: True
-
-model:
-  type: ViT
-  args:
-    image_size: 224
-    patch_size: 32
-    num_classes: 100
-    dim: 2048
-    depth: 8
-    heads: 16
-    mlp_dim: 4096
-    dropout: 0.1
