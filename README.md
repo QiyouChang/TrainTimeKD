@@ -11,7 +11,9 @@ conda activate vit
 
 # Usage
 
-To train ViT models solely (modelA), you need to specify the dataset config file in `configs/dataset` and the ViT config file in `config/vit`. For example, to train ViT-Base/16 on CIFAR-10 with mixed precision, you can run the following command:
+## Model A: Vision Transformer (ViT)
+
+To train ViT models solely, you need to specify the dataset config file in `configs/dataset` and the ViT config file in `config/vit`. For example, to train ViT-Base/16 on CIFAR-10 with mixed precision, you can run the following command:
 
 ```bash
 python train.py --model ../configs/vit/vit_base.yaml --data ../configs/dataset/cifar10.yaml --gpus 0 --set model.args.patch_size=16 --force --mixed
