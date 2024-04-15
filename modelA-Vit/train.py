@@ -12,7 +12,7 @@ from tqdm import tqdm
 import shutil
 
 
-def train(train_loader, model, optimizer, scheduler, criterion, epoch, device):
+def train(train_loader, model, optimizer, scheduler, scaler, criterion, epoch, device):
     model.train()
     total_loss = 0
     phar = tqdm(train_loader, desc=f'Epoch {epoch}')
@@ -20,10 +20,12 @@ def train(train_loader, model, optimizer, scheduler, criterion, epoch, device):
     for data, target in phar:
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
-        pred = model(data)
-        loss = criterion(pred, target)
-        loss.backward()
-        optimizer.step()
+        with torch.cuda.amp.autocast(enabled=scaler.is_enabled()):
+            pred = model(data)
+            loss = criterion(pred, target)
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
         total_loss += loss.item()
         curr_correct = (pred.argmax(1) == target).sum().item()
         correct += curr_correct
@@ -46,7 +48,7 @@ def evaluate(test_loader, model, criterion, device):
     return total_loss / len(test_loader), correct / len(test_loader.dataset)
 
 
-def main(config, gpus):
+def main(config, gpus, mixed_precision=False):
     train_loader, test_loader, model, optimizer, scheduler, device = prepare(config, gpus)
 
     # init wandb
@@ -65,11 +67,12 @@ def main(config, gpus):
 
     criterion = nn.CrossEntropyLoss()
     start = 1 if not config['resume'] else config['resume'] + 1
+    scaler = torch.cuda.amp.GradScaler(enabled=mixed_precision)
     # train your model
     for epoch in range(start, config['epochs'] + 1):
         lr = scheduler.get_last_lr()[0]
         # train your model
-        train_loss, train_acc = train(train_loader, model, optimizer, scheduler, criterion, epoch, device)
+        train_loss, train_acc = train(train_loader, model, optimizer, scheduler, scaler, criterion, epoch, device)
         # validate your model
         test_loss, test_acc = evaluate(test_loader, model, criterion, device)
         # log your results
@@ -98,22 +101,23 @@ def main(config, gpus):
 
 
 def parse(cfg, params):
-    for param in params:
-        if '=' not in param:
-            raise ValueError('Invalid argument: {}'.format(param))
-        key, value = param.split('=')
-        try:
-            value = int(value)
-        except ValueError:
+    if params:
+        for param in params:
+            if '=' not in param:
+                raise ValueError('Invalid argument: {}'.format(param))
+            key, value = param.split('=')
             try:
-                value = float(value)
+                value = int(value)
             except ValueError:
-                pass
-        curr = cfg
-        keys = key.split('.')
-        for key in keys[:-1]:
-            curr = curr[key]
-        curr[keys[-1]] = value
+                try:
+                    value = float(value)
+                except ValueError:
+                    pass
+            curr = cfg
+            keys = key.split('.')
+            for key in keys[:-1]:
+                curr = curr[key]
+            curr[keys[-1]] = value
 
     words = re.split('[{}]', cfg['experiment'])
     for i, word in enumerate(words):
@@ -133,8 +137,9 @@ if __name__ == '__main__':
                         help='path to the model configuration file')
     parser.add_argument('--data', type=str, default='configs/data/cifar10.yaml',
                         help='path to the dataset configuration file')
-    parser.add_argument('--set', type=str, nargs='+', help='override configuration file')
+    parser.add_argument('--set', type=str, nargs='+', default=[], help='override configuration file')
     parser.add_argument('--gpus', type=str, default='0', help='gpus to use')
+    parser.add_argument('--mixed', action='store_true', help='enable mixed precision training')
     parser.add_argument('--force', action='store_true', help='overwrite existing experiment')
     args = parser.parse_args()
 
@@ -156,4 +161,4 @@ if __name__ == '__main__':
         shutil.rmtree(output_root)
     os.makedirs(os.path.join(output_root, 'checkpoints'), exist_ok=True)
     config['output_dir'] = output_root
-    main(config, list(map(int, args.gpus.split(','))))
+    main(config, list(map(int, args.gpus.split(','))), args.mixed)

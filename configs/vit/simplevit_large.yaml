@@ -1,4 +1,4 @@
-experiment: vit-large-{model.args.patch_size}-{model.args.dropout}
+experiment: simplevit-large-{model.args.patch_size}
 batch_size: 32
 epochs: 100
 output_dir: save
@@ -16,7 +16,7 @@ scheduler:
     T_max: 100
 
 model:
-  type: ViT
+  type: SimpleViT
   args:
     image_size: 224
     patch_size: 16
@@ -25,4 +25,3 @@ model:
     depth: 24
     heads: 16
     mlp_dim: 4096
-    dropout: 0.2

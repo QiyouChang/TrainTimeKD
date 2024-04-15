@@ -1,5 +1,5 @@
 experiment: vit-base-{model.args.patch_size}-{model.args.dropout}
-batch_size: 64
+batch_size: 32
 epochs: 100
 output_dir: save
 resume: null
