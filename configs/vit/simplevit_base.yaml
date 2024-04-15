@@ -1,0 +1,27 @@
+experiment: simplevit-base-{model.args.patch_size}-{optimizer.type}
+batch_size: 32
+epochs: 100
+output_dir: save
+resume: null
+save_interval: 10
+
+optimizer:
+  type: Adam
+  args:
+    lr: 3.0e-5
+
+scheduler:
+  type: CosineAnnealingLR
+  args:
+    T_max: 100
+
+model:
+  type: SimpleViT
+  args:
+    image_size: 224
+    patch_size: 16
+    num_classes: null
+    dim: 768
+    depth: 12
+    heads: 12
+    mlp_dim: 3072

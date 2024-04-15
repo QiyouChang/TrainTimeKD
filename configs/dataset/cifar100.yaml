@@ -1,31 +1,16 @@
-experiment: cifar10-vit-s
-epochs: 100
-output_dir: save
-resume: null
-save_interval: 10
-
-optimizer:
-  type: Adam
-  args:
-    lr: 3.0e-5
-
-scheduler:
-  type: CosineAnnealingLR
-  args:
-    T_max: 100
-
 dataset:
-  type: CIFAR10
+  type: CIFAR100
   train:
     args:
       train: True
-      root: /data/baole/cifar10
+      root: /ocean/projects/cis220039p/bfang1/data/cifar100
       download: True
     transforms:
       - type: ToTensor
       - type: Resize
         args:
           size: [ 256, 256 ]
+          antialias: True
       - type: RandomCrop
         args:
           size: 224
@@ -35,38 +20,25 @@ dataset:
           mean: [ 0.49139968, 0.48215827 ,0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
-      batch_size: 64
       shuffle: True
-      num_workers: 16
+      num_workers: 0
       pin_memory: True
   test:
     args:
       train: False
-      root: /data/baole/cifar10
+      root: /ocean/projects/cis220039p/bfang1/data/cifar100
       download: True
     transforms:
       - type: ToTensor
       - type: Resize
         args:
           size: [ 224, 224 ]
+          antialias: True
       - type: Normalize
         args:
           mean: [ 0.49139968, 0.48215827, 0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
-      batch_size: 64
       shuffle: False
-      num_workers: 16
+      num_workers: 0
       pin_memory: True
-
-model:
-  type: ViT
-  args:
-    image_size: 224
-    patch_size: 32
-    num_classes: 10
-    dim: 512
-    depth: 4
-    heads: 8
-    mlp_dim: 1024
-    dropout: 0.1
