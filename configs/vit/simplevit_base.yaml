@@ -1,4 +1,4 @@
-experiment: simplevit-base-{model.args.patch_size}
+experiment: simplevit-base-{model.args.patch_size}-{optimizer.type}
 batch_size: 32
 epochs: 100
 output_dir: save

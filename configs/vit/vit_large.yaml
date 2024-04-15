@@ -1,4 +1,4 @@
-experiment: vit-large-{model.args.patch_size}-{model.args.dropout}
+experiment: vit-large-{model.args.patch_size}-{model.args.dropout}-{optimizer.type}
 batch_size: 32
 epochs: 100
 output_dir: save

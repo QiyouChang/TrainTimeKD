@@ -1,16 +1,31 @@
+experiment: cifar100-vit-p0 #could not run locally
+epochs: 100
+output_dir: save
+resume: null
+save_interval: 10
+
+optimizer:
+  type: AdamW  # AdamW is often preferred
+  args:
+    lr: 1.0e-3  # higher learning rate
+
+scheduler:
+  type: CosineAnnealingLR
+  args:
+    T_max: 100
+
 dataset:
-  type: CIFAR10
+  type: CIFAR100
   train:
     args:
       train: True
-      root: /ocean/projects/cis220039p/bfang1/data/cifar10
+      root: /data/cifar100
       download: True
     transforms:
       - type: ToTensor
       - type: Resize
         args:
           size: [ 256, 256 ]
-          antialias: True
       - type: RandomCrop
         args:
           size: 224
@@ -20,25 +35,39 @@ dataset:
           mean: [ 0.49139968, 0.48215827 ,0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
+      batch_size: 64
       shuffle: True
-      num_workers: 0
+      num_workers: 16
       pin_memory: True
   test:
     args:
       train: False
-      root: /ocean/projects/cis220039p/bfang1/data/cifar10
+      root: /data/cifar100
       download: True
     transforms:
       - type: ToTensor
       - type: Resize
         args:
           size: [ 224, 224 ]
-          antialias: True
       - type: Normalize
         args:
           mean: [ 0.49139968, 0.48215827, 0.44653124 ]
           std: [ 0.24703233, 0.24348505, 0.26158768 ]
     loader:
+      batch_size: 64
       shuffle: False
-      num_workers: 0
+      num_workers: 16
       pin_memory: True
+
+model:
+  type: ViT
+  args:
+    image_size: 224
+    patch_size: 16  # Smaller patch size can potentially improve performance
+    num_classes: 100
+    dim: 512 # try something intermediate
+    depth: 8 #intermediate-small
+    heads: 12  #intermediate-small
+    mlp_dim: 2048  # dim*4 instead of dim*2
+    dropout: 0.1
+
