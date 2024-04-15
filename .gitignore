@@ -1,0 +1,4 @@
+*.ipynb
+/data
+/modelA-Vit
+/ModelB-KD
