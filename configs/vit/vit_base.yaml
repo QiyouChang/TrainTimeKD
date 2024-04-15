@@ -20,7 +20,7 @@ model:
   args:
     image_size: 224
     patch_size: 16
-    num_classes: nil
+    num_classes: null
     dim: 768
     depth: 12
     heads: 12
