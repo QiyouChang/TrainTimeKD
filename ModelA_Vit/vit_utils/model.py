@@ -1,6 +1,6 @@
 # Created by Baole Fang at 4/2/24
-
-import vit_pytorch
+# Modified by George Chang at 4/13/24
+import ModelA_Vit.vit_pytorch as vit_pytorch
 from torch.nn.parallel import DataParallel
 
 def make_model(config, gpus, state, device, path):
