@@ -73,86 +73,96 @@ class BaseClass:
         self.loss_fn = loss_fn.to(self.device)
         self.ce_fn = nn.CrossEntropyLoss().to(self.device)
 
-    def train_teacher(
-        self,
-        epochs=20,
-        plot_losses=True,
-        save_model=True,
-        save_model_pth="./models/teacher.pt",
-    ):
-        """
-        Function that will be training the teacher
+    def load_teacher(self, load_model_pth):
+        print("Loading Teacher")
+        self.teacher_model.load_state_dict(torch.load(load_model_pth))
 
-        :param epochs (int): Number of epochs you want to train the teacher
-        :param plot_losses (bool): True if you want to plot the losses
-        :param save_model (bool): True if you want to save the teacher model
-        :param save_model_pth (str): Path where you want to store the teacher model
-        """
-        self.teacher_model.train()
-        loss_arr = []
-        length_of_dataset = len(self.train_loader.dataset)
-        best_acc = 0.0
-        self.best_teacher_model_weights = deepcopy(self.teacher_model.state_dict())
+    # def train_teacher(
+    #     self,
+    #     epochs=20,
+    #     plot_losses=True,
+    #     save_model=True,
+    #     save_model_pth="./models/teacher.pt",
+    # ):
+    #     """
+    #     Function that will be training the teacher
 
-        save_dir = os.path.dirname(save_model_pth)
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+    #     :param epochs (int): Number of epochs you want to train the teacher
+    #     :param plot_losses (bool): True if you want to plot the losses
+    #     :param save_model (bool): True if you want to save the teacher model
+    #     :param save_model_pth (str): Path where you want to store the teacher model
+    #     """
+    #     self.teacher_model.train()
+    #     loss_arr = []
+    #     length_of_dataset = len(self.train_loader.dataset)
+    #     best_acc = 0.0
+    #     self.best_teacher_model_weights = deepcopy(self.teacher_model.state_dict())
 
-        print("Training Teacher... ")
+    #     save_dir = os.path.dirname(save_model_pth)
+    #     if not os.path.exists(save_dir):
+    #         os.makedirs(save_dir)
 
-        for ep in range(epochs):
-            epoch_loss = 0.0
-            correct = 0
-            for (data, label) in self.train_loader:
-                data = data.to(self.device)
-                label = label.to(self.device)
-                out = self.teacher_model(data)
+    #     print("Training Teacher... ")
 
-                if isinstance(out, tuple):
-                    out = out[0]
+    #     for ep in range(epochs):
+    #         epoch_loss = 0.0
+    #         correct = 0
+    #         i = 0
+    #         # print("Epoch number:", str(i))
+    #         for (data, label) in self.train_loader:
+    #             # i += 1
+    #             # print("The", str(i), "th iteration with label:", label)
+    #             # if i >= 3:
+    #             #     break 
+    #             data = data.to(self.device)
+    #             label = label.to(self.device)
+    #             out = self.teacher_model(data)
 
-                pred = out.argmax(dim=1, keepdim=True)
-                correct += pred.eq(label.view_as(pred)).sum().item()
+    #             if isinstance(out, tuple):
+    #                 out = out[0]
 
-                loss = self.ce_fn(out, label)
+    #             pred = out.argmax(dim=1, keepdim=True)
+    #             correct += pred.eq(label.view_as(pred)).sum().item()
 
-                self.optimizer_teacher.zero_grad()
-                loss.backward()
-                self.optimizer_teacher.step()
+    #             loss = self.ce_fn(out, label)
 
-                epoch_loss += loss.item()
+    #             self.optimizer_teacher.zero_grad()
+    #             loss.backward()
+    #             self.optimizer_teacher.step()
 
-            epoch_acc = correct / length_of_dataset
+    #             epoch_loss += loss.item()
 
-            epoch_val_acc = self.evaluate(teacher=True)
+    #         epoch_acc = correct / length_of_dataset
 
-            if epoch_val_acc > best_acc:
-                best_acc = epoch_val_acc
-                self.best_teacher_model_weights = deepcopy(
-                    self.teacher_model.state_dict()
-                )
+    #         epoch_val_acc = self.evaluate(teacher=True)
 
-            if self.log:
-                self.writer.add_scalar("Training loss/Teacher", epoch_loss, epochs)
-                self.writer.add_scalar("Training accuracy/Teacher", epoch_acc, epochs)
-                self.writer.add_scalar(
-                    "Validation accuracy/Teacher", epoch_val_acc, epochs
-                )
+    #         if epoch_val_acc > best_acc:
+    #             best_acc = epoch_val_acc
+    #             self.best_teacher_model_weights = deepcopy(
+    #                 self.teacher_model.state_dict()
+    #             )
 
-            loss_arr.append(epoch_loss)
-            print(
-                "Epoch: {}, Loss: {}, Accuracy: {}".format(
-                    ep + 1, epoch_loss, epoch_acc
-                )
-            )
+    #         if self.log:
+    #             self.writer.add_scalar("Training loss/Teacher", epoch_loss, epochs)
+    #             self.writer.add_scalar("Training accuracy/Teacher", epoch_acc, epochs)
+    #             self.writer.add_scalar(
+    #                 "Validation accuracy/Teacher", epoch_val_acc, epochs
+    #             )
 
-            self.post_epoch_call(ep)
+    #         loss_arr.append(epoch_loss)
+    #         print(
+    #             "Epoch: {}, Loss: {}, Accuracy: {}".format(
+    #                 ep + 1, epoch_loss, epoch_acc
+    #             )
+    #         )
 
-        self.teacher_model.load_state_dict(self.best_teacher_model_weights)
-        if save_model:
-            torch.save(self.teacher_model.state_dict(), save_model_pth)
-        if plot_losses:
-            plt.plot(loss_arr)
+    #         # self.post_epoch_call(ep)
+
+    #     self.teacher_model.load_state_dict(self.best_teacher_model_weights)
+    #     if save_model:
+    #         torch.save(self.teacher_model.state_dict(), save_model_pth)
+    #     if plot_losses:
+    #         plt.plot(loss_arr)
 
     def _train_student(
         self,
@@ -185,9 +195,13 @@ class BaseClass:
         for ep in range(epochs):
             epoch_loss = 0.0
             correct = 0
-
+            i = 0
+            print("Epoch number:", str(i))
             for (data, label) in self.train_loader:
-
+                # i += 1
+                # print("The", str(i), "th iteration with label:", label)
+                # if i >= 3:
+                #     break 
                 data = data.to(self.device)
                 label = label.to(self.device)
 
@@ -278,9 +292,14 @@ class BaseClass:
         length_of_dataset = len(self.val_loader.dataset)
         correct = 0
         outputs = []
-
+        print("in eval model:")
         with torch.no_grad():
+            i = 0
             for data, target in self.val_loader:
+                # i += 1
+                # print("The", str(i), "th iteration with target:", target)
+                # if i >= 3:
+                #     break
                 data = data.to(self.device)
                 target = target.to(self.device)
                 output = model(data)

@@ -3,6 +3,7 @@ epochs: 100
 output_dir: save
 resume: null
 save_interval: 10
+load_model_path: models/teacher.pt
 
 dataset:
   type: CIFAR10

@@ -1,5 +1,6 @@
 # Created by Baole Fang at 4/2/24
 # Modified by George Chang at 4/13/24
+# from ModelA_Vit.vit_pytorch import vit_pytorch
 import ModelA_Vit.vit_pytorch as vit_pytorch
 from torch.nn.parallel import DataParallel
 
