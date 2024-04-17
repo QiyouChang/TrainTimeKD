@@ -75,7 +75,8 @@ class BaseClass:
 
     def load_teacher(self, load_model_pth):
         print("Loading Teacher")
-        self.teacher_model.load_state_dict(torch.load(load_model_pth))
+        self.teacher_model.load_state_dict(torch.load(load_model_pth)['model'])
+        self.teacher_model.to(self.device)
 
     def train_teacher(
         self,
