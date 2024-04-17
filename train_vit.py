@@ -1,11 +1,11 @@
 # Created by Baole Fang at 4/2/24
 import argparse
 import os
-import re
 
 import wandb
 import yaml
-from vit_utils import prepare
+from utils.vit_util import prepare
+from utils import parse
 import torch.nn as nn
 import torch
 from tqdm import tqdm
@@ -96,46 +96,15 @@ def main(config, gpus, mixed_precision=False):
             torch.save(state, output_path)
             output_path = os.path.join(config['output_dir'], 'checkpoints', 'epoch_latest.pth')
             torch.save(state, output_path)
-            wandb.save(output_path)
+            # wandb.save(output_path)
     run.finish()
-
-
-def parse(cfg, params):
-    if params:
-        for param in params:
-            if '=' not in param:
-                raise ValueError('Invalid argument: {}'.format(param))
-            key, value = param.split('=')
-            try:
-                value = int(value)
-            except ValueError:
-                try:
-                    value = float(value)
-                except ValueError:
-                    pass
-            curr = cfg
-            keys = key.split('.')
-            for key in keys[:-1]:
-                curr = curr[key]
-            curr[keys[-1]] = value
-
-    words = re.split('[{}]', cfg['experiment'])
-    for i, word in enumerate(words):
-        if i % 2 == 1:
-            curr = cfg
-            for key in word.split('.'):
-                curr = curr[key]
-            words[i] = str(curr)
-    cfg['experiment'] = ''.join(words)
-    cfg['experiment'] = '-'.join([cfg['dataset']['type'], cfg['experiment']])
-    return cfg
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='configs/vit/vit_base.yaml',
                         help='path to the model configuration file')
-    parser.add_argument('--data', type=str, default='configs/data/cifar10.yaml',
+    parser.add_argument('--data', type=str, default='configs/dataset/cifar10.yaml',
                         help='path to the dataset configuration file')
     parser.add_argument('--set', type=str, nargs='+', default=[], help='override configuration file')
     parser.add_argument('--gpus', type=str, default='0', help='gpus to use')
