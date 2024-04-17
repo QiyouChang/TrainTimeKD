@@ -1,0 +1,28 @@
+experiment: vit-student-{model.args.patch_size}-{model.args.dropout}-{optimizer.type}
+batch_size: 32
+epochs: 100
+output_dir: save
+resume: null
+save_interval: 10
+
+optimizer:
+  type: Adam
+  args:
+    lr: 3.0e-5
+
+scheduler:
+  type: CosineAnnealingLR
+  args:
+    T_max: 100
+
+model:
+  type: ViT
+  args:
+    image_size: 224
+    patch_size: 32
+    num_classes: null
+    dim: 256
+    depth: 4
+    heads: 4
+    mlp_dim: 512
+    dropout: 0.2
