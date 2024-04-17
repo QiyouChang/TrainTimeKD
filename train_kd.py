@@ -26,8 +26,11 @@ def main(config, gpus):
 
     distiller = VanillaKD(teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer)
     
-    distiller.train_teacher(epochs=100, plot_losses=True, save_model=True)    # Train the teacher network
-    distiller.train_student(epochs=100, plot_losses=True, save_model=True)    # Train the student network
+    distiller.load_teacher(config['load_model_path'])
+    # Code Switch for modelB to self train teacher model
+    #distiller.train_teacher(epochs=2, plot_losses=True, save_model=True)    # Train the teacher network
+    
+    distiller.train_student(epochs=2, plot_losses=True, save_model=True)    # Train the student network
     distiller.evaluate(teacher=False)  
 
 if __name__ == '__main__':
