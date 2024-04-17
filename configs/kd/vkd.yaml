@@ -1,0 +1,39 @@
+experiment: cifar10_vkd
+batch_size: 32
+epochs: 100
+output_dir: save
+resume: null
+save_interval: 10
+load_model_path: models/teacher.pt
+
+teacher_model:
+  type: SimpleViT
+  args:
+    image_size: 224
+    patch_size: 16
+    num_classes: null
+    dim: 1024
+    depth: 24
+    heads: 16
+    mlp_dim: 4096
+
+student_model:
+  type: SimpleViT
+  args:
+    image_size: 224
+    patch_size: 32
+    num_classes: null
+    dim: 256
+    depth: 4
+    heads: 4
+    mlp_dim: 512
+
+teacher_optimizer:
+  type: SGD 
+  args:
+    lr: 0.01
+
+student_optimizer:
+  type: SGD 
+  args:
+    lr: 0.01
