@@ -73,6 +73,11 @@ class BaseClass:
         self.loss_fn = loss_fn.to(self.device)
         self.ce_fn = nn.CrossEntropyLoss().to(self.device)
 
+    def load_teacher(self, load_model_pth):
+        print("Loading Teacher")
+        self.teacher_model.load_state_dict(torch.load(load_model_pth)['model'])
+        self.teacher_model.to(self.device)
+
     def train_teacher(
         self,
         epochs=20,
@@ -103,7 +108,13 @@ class BaseClass:
         for ep in range(epochs):
             epoch_loss = 0.0
             correct = 0
+            i = 0
+            # print("Epoch number:", str(i))
             for (data, label) in self.train_loader:
+                # i += 1
+                # print("The", str(i), "th iteration with label:", label)
+                # if i >= 3:
+                #     break 
                 data = data.to(self.device)
                 label = label.to(self.device)
                 out = self.teacher_model(data)
@@ -146,7 +157,7 @@ class BaseClass:
                 )
             )
 
-            self.post_epoch_call(ep)
+            # self.post_epoch_call(ep)
 
         self.teacher_model.load_state_dict(self.best_teacher_model_weights)
         if save_model:
@@ -185,9 +196,13 @@ class BaseClass:
         for ep in range(epochs):
             epoch_loss = 0.0
             correct = 0
-
+            i = 0
+            print("Epoch number:", str(i))
             for (data, label) in self.train_loader:
-
+                # i += 1
+                # print("The", str(i), "th iteration with label:", label)
+                # if i >= 3:
+                #     break 
                 data = data.to(self.device)
                 label = label.to(self.device)
 
@@ -278,9 +293,14 @@ class BaseClass:
         length_of_dataset = len(self.val_loader.dataset)
         correct = 0
         outputs = []
-
+        print("in eval model:")
         with torch.no_grad():
+            i = 0
             for data, target in self.val_loader:
+                # i += 1
+                # print("The", str(i), "th iteration with target:", target)
+                # if i >= 3:
+                #     break
                 data = data.to(self.device)
                 target = target.to(self.device)
                 output = model(data)
