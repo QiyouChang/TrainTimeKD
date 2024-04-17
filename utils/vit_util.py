@@ -7,8 +7,6 @@ from .optimizer import make_optimizer
 from .scheduler import make_scheduler
 import torch
 
-__all__ = ['prepare']
-
 def prepare(config, gpus):
     train_loader, test_loader = make_dataloaders(config['dataset'], config['batch_size'])
     n_classes = len(train_loader.dataset.classes)
