@@ -6,16 +6,16 @@ import yaml
 from utils.kd_util import prepare
 from utils import parse
 import shutil
-from KD.vanilla_kd import VanillaKD
+from kd.vanilla_kd import VanillaKD
 
 def main(config, gpus):
     # init wandb
     if config['resume']:
         with open(os.path.join(config['output_dir'], 'wandb.txt'), 'r') as f:
             wandb_id = f.read().strip()
-        run = wandb.init(config=config, project=config['experiment'], resume="allow", id=wandb_id)
+        run = wandb.init(config=config, project=config['dataset']['type'], name=config['experiment'], resume="allow", id=wandb_id)
     else:
-        run = wandb.init(config=config, project=config['experiment'], resume="allow")
+        run = wandb.init(config=config, project=config['dataset']['type'], name=config['experiment'], resume="allow")
         with open(os.path.join(config['output_dir'], 'wandb.txt'), 'w') as f:
             f.write(run.id)
 
@@ -24,14 +24,14 @@ def main(config, gpus):
 
     teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer = prepare(config, gpus)
 
-    distiller = VanillaKD(teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer)
-    
-    distiller.load_teacher(config['load_model_path'])
+    distiller = VanillaKD(teacher_model, student_model, train_loader, test_loader, teacher_optimizer, student_optimizer, **config['kd_model']['args'])
+
+    distiller.load_teacher(config['teacher_model_path'])
     # Code Switch for modelB to self train teacher model
     #distiller.train_teacher(epochs=2, plot_losses=True, save_model=True)    # Train the teacher network
     
-    distiller.train_student(epochs=2, plot_losses=True, save_model=True)    # Train the student network
-    distiller.evaluate(teacher=False)  
+    distiller.train_student(epochs=config['epochs'], plot_losses=False, save_model_pth=os.path.join(config['output_dir'], 'checkpoints', 'epoch_latest.pth'), save_model=True)    # Train the student network
+    distiller.evaluate(teacher=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from KD import BaseClass
+from kd import BaseClass
 
 
 class VanillaKD(BaseClass):

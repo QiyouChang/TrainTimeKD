@@ -1,16 +1,24 @@
-experiment: cifar10_vkd
+experiment: vkd-{kd_model.args.distil_weight}-{kd_model.args.temp}-{student_optimizer.type}-{student_optimizer.args.lr}
 batch_size: 32
-epochs: 100
+epochs: 50
 output_dir: save
 resume: null
 save_interval: 10
-load_model_path: models/teacher.pt
+teacher_model_path: null
+
+kd_model:
+  type: VKD
+  args:
+    distil_weight: 0.5
+    temp: 20
+    device: cuda
+    log: True
 
 teacher_model:
   type: SimpleViT
   args:
     image_size: 224
-    patch_size: 16
+    patch_size: 32
     num_classes: null
     dim: 1024
     depth: 24
@@ -29,11 +37,11 @@ student_model:
     mlp_dim: 512
 
 teacher_optimizer:
-  type: SGD 
+  type: SGD
   args:
     lr: 0.01
 
 student_optimizer:
-  type: SGD 
+  type: SGD
   args:
     lr: 0.01

@@ -4,8 +4,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-from torch.utils.tensorboard import SummaryWriter
-
+import wandb
 
 class BaseClass:
     """
@@ -49,9 +48,6 @@ class BaseClass:
         self.distil_weight = distil_weight
         self.log = log
         self.logdir = logdir
-
-        if self.log:
-            self.writer = SummaryWriter(logdir)
 
         if device == "cpu":
             self.device = torch.device("cpu")
@@ -144,11 +140,7 @@ class BaseClass:
                 )
 
             if self.log:
-                self.writer.add_scalar("Training loss/Teacher", epoch_loss, epochs)
-                self.writer.add_scalar("Training accuracy/Teacher", epoch_acc, epochs)
-                self.writer.add_scalar(
-                    "Validation accuracy/Teacher", epoch_val_acc, epochs
-                )
+                wandb.log({"teacher_train_loss": epoch_loss, "teacher_train_acc": epoch_acc, "teacher_test_acc": epoch_val_acc, "teacher_epoch": ep})
 
             loss_arr.append(epoch_loss)
             print(
@@ -234,11 +226,7 @@ class BaseClass:
                 )
 
             if self.log:
-                self.writer.add_scalar("Training loss/Student", epoch_loss, epochs)
-                self.writer.add_scalar("Training accuracy/Student", epoch_acc, epochs)
-                self.writer.add_scalar(
-                    "Validation accuracy/Student", epoch_val_acc, epochs
-                )
+                wandb.log({"student_train_loss": epoch_loss, "student_train_acc": epoch_acc, "student_test_acc": epoch_val_acc, "student_epoch": ep})
 
             loss_arr.append(epoch_loss)
             print(
