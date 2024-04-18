@@ -1,6 +1,6 @@
 experiment: vkd-{kd_model.args.distil_weight}-{kd_model.args.temp}-{student_optimizer.type}-{student_optimizer.args.lr}
 batch_size: 32
-epochs: 50
+epochs: 100
 output_dir: save
 resume: null
 save_interval: 10
