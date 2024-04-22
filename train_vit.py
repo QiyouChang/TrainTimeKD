@@ -130,8 +130,4 @@ if __name__ == '__main__':
         shutil.rmtree(output_root)
     os.makedirs(os.path.join(output_root, 'checkpoints'), exist_ok=True)
     config['output_dir'] = output_root
-    config['dataset']['train']['loader']['num_workers'] = min(config['dataset']['train']['loader']['num_workers'],
-                                                              len(os.sched_getaffinity(0)))
-    config['dataset']['test']['loader']['num_workers'] = min(config['dataset']['test']['loader']['num_workers'],
-                                                             len(os.sched_getaffinity(0)))
     main(config, list(map(int, args.gpus.split(','))), args.mixed)
