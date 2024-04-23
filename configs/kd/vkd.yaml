@@ -37,11 +37,11 @@ student_model:
     mlp_dim: 512
 
 teacher_optimizer:
-  type: SGD
+  type: Adam
   args:
-    lr: 0.01
+    lr: 3.0e-5
 
 student_optimizer:
-  type: SGD
+  type: Adam
   args:
-    lr: 0.01
+    lr: 3.0e-5
