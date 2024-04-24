@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import wandb
 
-class myKDBaseClass:
+class CoBaseClass:
     """
     Basic implementation of a general Knowledge Distillation framework
 
@@ -71,9 +71,9 @@ class myKDBaseClass:
 
     def train_model(
         self,
-        epochs_teacher=20,
-        epochs_student=10,
-        plot_losses=True,
+        epochs=20,
+        student_start=10,
+        student_step=5,
         save_teacher_model=True,
         save_student_model=True,
         save_teacher_model_pth="./models/teacher.pt",
@@ -103,9 +103,7 @@ class myKDBaseClass:
         if not os.path.exists(save_student_dir):
             os.makedirs(save_student_dir)
 
-        epoch_ratio = epochs_teacher // epochs_student
-
-        for ep in range(epochs_teacher):
+        for ep in range(epochs):
             print("Training Teacher... ")
             epoch_loss = 0.0
             correct = 0
@@ -113,9 +111,7 @@ class myKDBaseClass:
 
             for (data, label) in self.train_loader:
                 i += 1
-                print("The", str(i), "th iteration with label:", label)
-                if i >= 3:
-                    break 
+                # print("The", str(i), "th iteration with label:", label)
                 data = data.to(self.device)
                 label = label.to(self.device)
                 out = self.teacher_model(data)
@@ -153,7 +149,7 @@ class myKDBaseClass:
                     ep + 1, epoch_loss, epoch_acc
                 )
             )
-            if ep // epoch_ratio * epoch_ratio == ep:
+            if ep>=student_start and (ep-student_start)%student_step==0:
                 print("Training students...")
                 self.teacher_model.eval()
                 self.student_model.train()
@@ -162,9 +158,7 @@ class myKDBaseClass:
                 i = 0 
                 for (data, label) in self.train_loader:
                     i += 1
-                    print("The", str(i), "th iteration with label:", label)
-                    if i >= 3:
-                        break 
+                    # print("The", str(i), "th iteration with label:", label)
                     data = data.to(self.device)
                     label = label.to(self.device)
 
@@ -238,14 +232,12 @@ class myKDBaseClass:
         length_of_dataset = len(self.val_loader.dataset)
         correct = 0
         outputs = []
-        print("in eval model:")
+        # print("in eval model:")
         with torch.no_grad():
             i = 0
             for data, target in self.val_loader:
                 i += 1
-                print("The", str(i), "th iteration with target:", target)
-                if i >= 3:
-                    break
+                # print("The", str(i), "th iteration with target:", target)
                 data = data.to(self.device)
                 target = target.to(self.device)
                 output = model(data)

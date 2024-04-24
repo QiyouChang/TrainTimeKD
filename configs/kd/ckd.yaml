@@ -1,0 +1,49 @@
+experiment: ckd-{student_start}-{student_step}
+batch_size: 32
+epochs: 100
+student_start: 0
+student_step: 1
+output_dir: save
+resume: null
+save_interval: 10
+teacher_model_path: null
+
+kd_model:
+  type: VKD
+  args:
+    distil_weight: 0.8
+    temp: 20
+    device: cuda
+    log: True
+
+teacher_model:
+  type: SimpleViT
+  args:
+    image_size: 224
+    patch_size: 32
+    num_classes: null
+    dim: 1024
+    depth: 24
+    heads: 16
+    mlp_dim: 4096
+
+student_model:
+  type: SimpleViT
+  args:
+    image_size: 224
+    patch_size: 32
+    num_classes: null
+    dim: 256
+    depth: 4
+    heads: 4
+    mlp_dim: 512
+
+teacher_optimizer:
+  type: Adam
+  args:
+    lr: 3.0e-5
+
+student_optimizer:
+  type: Adam
+  args:
+    lr: 3.0e-5
