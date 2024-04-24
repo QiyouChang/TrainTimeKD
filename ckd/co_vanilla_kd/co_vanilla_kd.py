@@ -1,10 +1,10 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ModelC import myKDBaseClass
+from ckd import CoBaseClass
 
 
-class VanillaKD(myKDBaseClass):
+class CoVanillaKD(CoBaseClass):
     """
     Original implementation of Knowledge distillation from the paper "Distilling the
     Knowledge in a Neural Network" https://arxiv.org/pdf/1503.02531.pdf
@@ -34,11 +34,11 @@ class VanillaKD(myKDBaseClass):
         loss_fn=nn.MSELoss(),
         temp=20.0,
         distil_weight=0.5,
-        device="cpu",
+        device="cuda",
         log=False,
         logdir="./Experiments",
     ):
-        super(VanillaKD, self).__init__(
+        super(CoVanillaKD, self).__init__(
             teacher_model,
             student_model,
             train_loader,
