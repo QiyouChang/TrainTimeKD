@@ -47,3 +47,6 @@ To train the valina knowledge distillation model, you need to specify the datase
 python train_ckd.py --model configs/kd/ckd.yaml --data configs/dataset/cifar10.yaml --gpus 0 --force
 ```
 
+# Results
+
+Our training logs on 200 configurations trained over 2000 hours can be checked in wandb for [CIFAR-10](https://wandb.ai/baolef-cmu/CIFAR10) and [CIFAR-100](https://wandb.ai/baolef-cmu/CIFAR100).
